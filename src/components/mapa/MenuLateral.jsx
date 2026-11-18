@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { baseDeDados } from "../../data/baseDeDados";
 
-const VERSAO_ATUAL = "0.5.7";
+const VERSAO_ATUAL = __APP_VERSION__;
 
 export default function MenuLateral({
   aberto,
@@ -21,7 +21,6 @@ export default function MenuLateral({
 
   return (
     <>
-      {/* Menu Lateral */}
       {aberto && (
         <div className="menu-overlay" onClick={onFechar}>
           <div
@@ -29,7 +28,6 @@ export default function MenuLateral({
             onClick={(e) => e.stopPropagation()}
           >
             <div>
-              {/* Cabeçalho */}
               <div className="menu-header">
                 <div className="menu-brand-wrapper">
                   <div className="menu-logo-icon">
@@ -64,7 +62,6 @@ export default function MenuLateral({
                 </button>
               </div>
 
-              {/* Modo Noturno Switch */}
               <div className="menu-section-divider">
                 <div onClick={onAlternarModoNoturno} className="menu-item-row">
                   <div className="menu-item-left">
@@ -89,7 +86,6 @@ export default function MenuLateral({
                 </div>
               </div>
 
-              {/* Seção de Ferramentas / Gestor de Gastos */}
               <div className="menu-section-divider">
                 <div className="menu-items-list" style={{ marginTop: 0 }}>
                   <Link
@@ -126,7 +122,6 @@ export default function MenuLateral({
                 </div>
               </div>
 
-              {/* Lista de Ações */}
               <div className="menu-items-list">
                 <ItemMenu
                   icone={
@@ -245,7 +240,6 @@ export default function MenuLateral({
               </div>
             </div>
 
-            {/* Rodapé com Versão Dinâmica */}
             <div className="menu-footer">
               <img
                 src="https://hitscounter.dev/api/hit?url=https%3A%2F%2Flucasdosantu.github.io%2Fquadras-sade%2F&label=Visitas&icon=pin-map&color=%23198754&message=&style=for-the-badge&tz=UTC"
@@ -260,7 +254,6 @@ export default function MenuLateral({
         </div>
       )}
 
-      {/* Modal Guia de Uso */}
       {modalGuiaAberto && (
         <div
           className="modal-overlay"
