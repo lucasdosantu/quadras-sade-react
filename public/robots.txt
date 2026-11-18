@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Disallow: /admin/
+
+Sitemap: https://lucasdosantu.github.io/quadras-sade/sitemap.xml
