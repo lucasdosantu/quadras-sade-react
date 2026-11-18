@@ -17,8 +17,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl,
 });
 
-// Resto do seu código do Mapa.jsx...
-
 export default function Mapa({ onMudancaSelecao }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);

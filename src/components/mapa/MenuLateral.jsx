@@ -190,7 +190,10 @@ export default function MenuLateral({
                   }
                   texto="Reportar Erro no Mapa"
                   onClick={() => {
-                    window.open("https://forms.gle/exemplo_erro", "_blank");
+                    window.open(
+                      "https://forms.gle/e2cBxK6Q86CTtRcj9",
+                      "_blank",
+                    );
                     onFechar();
                   }}
                 />
