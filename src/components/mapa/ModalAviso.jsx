@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const VERSAO_SISTEMA = "1.5.7";
+const VERSAO_SISTEMA = "0.0.1";
 
 export default function ModalAviso() {
   const [mostrar, setMostrar] = useState(false);
