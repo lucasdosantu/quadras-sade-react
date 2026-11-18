@@ -7,6 +7,17 @@ import { useRota } from "../../hooks/useRota";
 import BarraBusca from "./BarraBusca";
 import MenuLateral from "./MenuLateral";
 import PainelRota from "./PainelRota";
+import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+import iconUrl from "leaflet/dist/images/marker-icon.png";
+import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+});
+
+// Resto do seu código do Mapa.jsx...
 
 export default function Mapa({ onMudancaSelecao }) {
   const mapRef = useRef(null);
