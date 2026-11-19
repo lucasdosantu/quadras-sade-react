@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import GestorGastos from "./pages/GestorGastos";
 import { Mapa, ModalAviso, BannerAnuncios } from "./components/mapa";
+
+const GestorGastos = lazy(() => import("./pages/GestorGastos"));
 
 function PaginaMapa() {
   const [temLocalAberto, setTemLocalAberto] = useState(false);
@@ -32,10 +33,12 @@ export default function App() {
         overflow: "hidden",
       }}
     >
-      <Routes>
-        <Route path="/" element={<PaginaMapa />} />
-        <Route path="/gastos" element={<GestorGastos />} />
-      </Routes>
+      <Suspense fallback={<div>Carregando...</div>}>
+        <Routes>
+          <Route path="/" element={<PaginaMapa />} />
+          <Route path="/gastos" element={<GestorGastos />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }

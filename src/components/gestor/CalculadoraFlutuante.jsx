@@ -1,5 +1,87 @@
 import React from "react";
 
+function avaliarExpressaoMatematica(expressao) {
+  const limpa = expressao
+    .replace(/×/g, "*")
+    .replace(/÷/g, "/")
+    .replace(/,/g, ".")
+    .replace(/\s+/g, "");
+
+  if (!limpa) return "0";
+  if (!/^[0-9+\-*/().]+$/.test(limpa)) {
+    throw new Error("Expressão inválida");
+  }
+
+  const tokens = limpa.match(/(\d+(?:\.\d+)?|[+\-*/()])/g);
+  if (!tokens) {
+    throw new Error("Expressão inválida");
+  }
+
+  let index = 0;
+
+  function parseExpressao() {
+    let valor = parseTermo();
+    while (
+      index < tokens.length &&
+      (tokens[index] === "+" || tokens[index] === "-")
+    ) {
+      const op = tokens[index++];
+      const proximo = parseTermo();
+      valor = op === "+" ? valor + proximo : valor - proximo;
+    }
+    return valor;
+  }
+
+  function parseTermo() {
+    let valor = parseFator();
+    while (
+      index < tokens.length &&
+      (tokens[index] === "*" || tokens[index] === "/")
+    ) {
+      const op = tokens[index++];
+      const proximo = parseFator();
+      if (op === "/" && proximo === 0) {
+        throw new Error("Divisão por zero");
+      }
+      valor = op === "*" ? valor * proximo : valor / proximo;
+    }
+    return valor;
+  }
+
+  function parseFator() {
+    const token = tokens[index];
+
+    if (token === "+" || token === "-") {
+      index++;
+      return token === "-" ? -parseFator() : parseFator();
+    }
+
+    if (token === "(") {
+      index++;
+      const valor = parseExpressao();
+      if (tokens[index] !== ")") {
+        throw new Error("Parêntese não fechado");
+      }
+      index++;
+      return valor;
+    }
+
+    if (token && /^\d+(?:\.\d+)?$/.test(token)) {
+      index++;
+      return parseFloat(token);
+    }
+
+    throw new Error("Token inválido");
+  }
+
+  const resultado = parseExpressao();
+  if (index !== tokens.length || !Number.isFinite(resultado)) {
+    throw new Error("Resultado inválido");
+  }
+
+  return String(Number(resultado.toFixed(10)));
+}
+
 export default function CalculadoraFlutuante({
   calcState,
   setCalcState,
@@ -8,6 +90,14 @@ export default function CalculadoraFlutuante({
   calcDisplay,
   setCalcDisplay,
 }) {
+  const calcularResultado = () => {
+    try {
+      setCalcDisplay(avaliarExpressaoMatematica(calcDisplay));
+    } catch {
+      setCalcDisplay("Erro");
+    }
+  };
+
   if (calcState === "closed") {
     return (
       <button
@@ -168,20 +258,7 @@ export default function CalculadoraFlutuante({
               </button>
             ),
           )}
-          <button
-            onClick={() => {
-              try {
-                setCalcDisplay(
-                  String(
-                    eval(calcDisplay.replace(/×/g, "*").replace(/÷/g, "/")),
-                  ),
-                );
-              } catch {
-                setCalcDisplay("Erro");
-              }
-            }}
-            className="btn-equal"
-          >
+          <button onClick={calcularResultado} className="btn-equal">
             =
           </button>
           <button
