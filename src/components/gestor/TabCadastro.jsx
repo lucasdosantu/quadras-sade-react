@@ -5,6 +5,8 @@ export default function TabCadastro({
   currentMonth,
   onChangeMonth,
   onOpenMenu,
+  hideAmounts,
+  onToggleHideAmounts,
   formData,
   setFormData,
   categories,
@@ -19,6 +21,8 @@ export default function TabCadastro({
         currentMonth={currentMonth}
         onMonthChange={onChangeMonth}
         onOpenMenu={onOpenMenu}
+        hideAmounts={hideAmounts}
+        onToggleHideAmounts={onToggleHideAmounts}
       />
 
       <form onSubmit={onSubmit} className="card">

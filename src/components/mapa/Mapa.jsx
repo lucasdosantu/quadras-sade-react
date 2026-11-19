@@ -21,6 +21,8 @@ export default function Mapa({ onMudancaSelecao }) {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const marcadorAtualRef = useRef(null);
+  const camadaRuaRef = useRef(null);
+  const camadaSateliteRef = useRef(null);
 
   const [localSelecionado, setLocalSelecionado] = useState(null);
   const [tipoCamada, setTipoCamada] = useState("rua");
@@ -47,18 +49,25 @@ export default function Mapa({ onMudancaSelecao }) {
 
   useEffect(() => {
     if (!mapInstanceRef.current) {
-      const layerRua = L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}inspect/{x}/{y}.png",
-        { maxZoom: 19, crossOrigin: true },
-      );
-
-      const tileLayer = L.tileLayer(
+      const camadaRua = L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         { maxZoom: 19, crossOrigin: true },
       );
 
+      const camadaSatelite = L.tileLayer(
+        "https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+        {
+          maxZoom: 20,
+          subdomains: ["mt0", "mt1", "mt2", "mt3"],
+          crossOrigin: true,
+        },
+      );
+
+      camadaRuaRef.current = camadaRua;
+      camadaSateliteRef.current = camadaSatelite;
+
       const map = L.map(mapRef.current, {
-        layers: [tileLayer],
+        layers: [camadaRua],
         zoomControl: false,
       }).setView([-15.943, -48.265], 13);
 
@@ -161,24 +170,15 @@ export default function Mapa({ onMudancaSelecao }) {
 
   const alternarSatelite = () => {
     const map = mapInstanceRef.current;
-    if (!map) return;
-
-    map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer) map.removeLayer(layer);
-    });
+    if (!map || !camadaRuaRef.current || !camadaSateliteRef.current) return;
 
     if (tipoCamada === "rua") {
-      L.tileLayer("https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
-        maxZoom: 20,
-        subdomains: ["mt0", "mt1", "mt2", "mt3"],
-        crossOrigin: true,
-      }).addTo(map);
+      map.removeLayer(camadaRuaRef.current);
+      camadaSateliteRef.current.addTo(map);
       setTipoCamada("satelite");
     } else {
-      L.tileLayer("https://{s}.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        crossOrigin: true,
-      }).addTo(map);
+      map.removeLayer(camadaSateliteRef.current);
+      camadaRuaRef.current.addTo(map);
       setTipoCamada("rua");
     }
   };

@@ -181,6 +181,13 @@ export default function GestorGastos() {
     );
   };
 
+  const toggleHideAmounts = () => {
+    setConfig((prev) => ({
+      ...prev,
+      hideAmounts: !prev.hideAmounts,
+    }));
+  };
+
   const changeMonth = (delta) => {
     const [year, month] = currentMonth.split("-").map(Number);
     const newDate = new Date(year, month - 1 + delta, 1);
@@ -376,6 +383,8 @@ export default function GestorGastos() {
             currentMonth={currentMonth}
             onChangeMonth={changeMonth}
             onOpenMenu={() => setMenuAberto(true)}
+            hideAmounts={config.hideAmounts}
+            onToggleHideAmounts={toggleHideAmounts}
             formData={formData}
             setFormData={setFormData}
             categories={categories}
@@ -388,6 +397,8 @@ export default function GestorGastos() {
           <TabResumo
             currentMonth={currentMonth}
             onOpenMenu={() => setMenuAberto(true)}
+            hideAmounts={config.hideAmounts}
+            onToggleHideAmounts={toggleHideAmounts}
             unpaidSum={unpaidSum}
             paidSum={paidSum}
             formatDisplayMoney={formatDisplayMoney}
@@ -400,6 +411,8 @@ export default function GestorGastos() {
             currentMonth={currentMonth}
             onChangeMonth={changeMonth}
             onOpenMenu={() => setMenuAberto(true)}
+            hideAmounts={config.hideAmounts}
+            onToggleHideAmounts={toggleHideAmounts}
             filteredAccounts={filteredAccounts}
             getAccountStatus={getAccountStatus}
             config={config}

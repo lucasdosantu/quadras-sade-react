@@ -4,6 +4,8 @@ import HeaderGestor from "./HeaderGestor";
 export default function TabResumo({
   currentMonth,
   onOpenMenu,
+  hideAmounts,
+  onToggleHideAmounts,
   unpaidSum,
   paidSum,
   formatDisplayMoney,
@@ -15,6 +17,8 @@ export default function TabResumo({
         title="Resumo Mensal"
         subtitle={currentMonth}
         onOpenMenu={onOpenMenu}
+        hideAmounts={hideAmounts}
+        onToggleHideAmounts={onToggleHideAmounts}
       />
 
       <div className="summary-grid-2">

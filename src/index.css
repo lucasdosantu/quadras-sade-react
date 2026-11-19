@@ -1,6 +1,4 @@
-/* ================================================================= */
-/* 1. VARIÁVEIS GLOBAIS E TEMA (LIGHT / DARK)                        */
-/* ================================================================= */
+/* 1. Variáveis Globais e Tema (Light / Dark) */
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -62,9 +60,7 @@
   overflow: hidden;
 }
 
-/* ================================================================= */
-/* 2. ESTRUTURA BASE (HTML, BODY E ROOT) - TOTALMENTE TRAVADOS       */
-/* ================================================================= */
+/* 2. Estrutura Base (HTML, Body e Root) */
 html,
 body {
   width: 100vw;
@@ -142,9 +138,7 @@ code {
   background: var(--code-bg);
 }
 
-/* ================================================================= */
-/* 3. BANNER DE ANÚNCIOS (IMAGEM PROPORCIONAL 400x100)               */
-/* ================================================================= */
+/* 3. Banner de Anúncios */
 .banner-anuncio-container {
   position: absolute;
   bottom: 16px;
@@ -211,9 +205,7 @@ code {
   display: none;
 }
 
-/* ================================================================= */
-/* 4. MENU LATERAL (DRAWER / OVERLAY) - ROLAGEM INTERNA PERMITIDA    */
-/* ================================================================= */
+/* 4. Menu Lateral (Drawer / Overlay) */
 .menu-overlay {
   position: fixed;
   top: 0;
@@ -257,7 +249,16 @@ code {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+}
+
+.menu-content.light .menu-header {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.menu-content.dark .menu-header {
+  border-bottom: 1px solid #27272a;
 }
 
 .menu-brand-wrapper {
@@ -270,14 +271,13 @@ code {
 .menu-logo-icon {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00875a 0%, #1e293b 100%);
+  border-radius: 12px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 135, 90, 0.25);
+  overflow: visible;
 }
 
 .menu-title-wrapper {
@@ -328,8 +328,8 @@ code {
 .menu-section-divider {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .menu-content.light .menu-section-divider {
@@ -369,7 +369,6 @@ code {
   gap: 14px;
 }
 
-/* Padronização milimétrica da largura e centralização dos ícones */
 .menu-icon-yellow,
 .menu-item-icon-wrapper {
   display: flex;
@@ -424,44 +423,50 @@ code {
   color: #94a3b8;
 }
 
-.switch-track {
+/* Switch */
+.menu-content .switch-track {
   width: 44px;
   height: 24px;
-  background-color: #f8fafc !important; /* Cor padrão desligado */
+  background-color: #f1f5f9;
   border: 1px solid #e2e8f0;
   border-radius: 24px;
   position: relative;
-  transition: background-color 0.25s ease;
-  display: flex;
-  align-items: center;
-  padding: 2px;
-  box-sizing: border-box;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
   flex-shrink: 0;
+  box-sizing: border-box;
   cursor: pointer;
 }
 
 .menu-content.dark .switch-track {
-  background-color: #3f3f46;
+  background-color: #27272a;
+  border-color: #27272a;
 }
 
-.switch-track.ativo {
-  background-color: #2563eb !important; /* Cor verde/azul ativa */
+.menu-content .switch-track.ativo {
+  background-color: #2563eb;
+  border-color: #2563eb;
 }
 
-.switch-thumb {
-  width: 20px;
-  height: 20px;
+.menu-content .switch-thumb {
+  width: 18px;
+  height: 18px;
   background-color: #64748b;
   border-radius: 50%;
   position: absolute;
   top: 2px;
   left: 2px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  transform: translateX(0) #e2e8f0;
-  transition: transform 0.25s ease;
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
 }
 
-.switch-thumb.ativo {
+.menu-content.dark .switch-thumb {
+  background-color: #a1a1aa;
+}
+
+.menu-content .switch-thumb.ativo {
   transform: translateX(20px);
   background-color: #ffffff;
 }
@@ -501,9 +506,7 @@ code {
   color: #f8fafc;
 }
 
-/* ================================================================= */
-/* 5. MODAIS (AVISOS E DIÁLOGOS) - ROLAGEM INTERNA PERMITIDA         */
-/* ================================================================= */
+/* 5. Modais (Avisos e Diálogos) */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -609,9 +612,7 @@ code {
   font-size: 24px;
 }
 
-/* ================================================================= */
-/* 6. BARRA DE BUSCA E LISTA FLUTUANTE                               */
-/* ================================================================= */
+/* 6. Barra de Busca e Lista Flutuante */
 .barra-busca-wrapper {
   position: absolute;
   top: 16px;

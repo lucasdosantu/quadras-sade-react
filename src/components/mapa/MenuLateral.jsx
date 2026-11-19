@@ -32,17 +32,81 @@ export default function MenuLateral({
                 <div className="menu-brand-wrapper">
                   <div className="menu-logo-icon">
                     <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 512 512"
+                      width="100%"
+                      height="100%"
+                      aria-label="Logo SADE"
                     >
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
+                      <defs>
+                        <linearGradient
+                          id="pinGrad"
+                          x1="0%"
+                          y1="0%"
+                          x2="0%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#ff5252" />
+                          <stop offset="100%" stopColor="#d32f2f" />
+                        </linearGradient>
+
+                        <filter
+                          id="shadow"
+                          x="-20%"
+                          y="-20%"
+                          width="140%"
+                          height="140%"
+                        >
+                          <feDropShadow
+                            dx="0"
+                            dy="6"
+                            stdDeviation="8"
+                            floodColor="#000000"
+                            floodOpacity="0.35"
+                          />
+                        </filter>
+                      </defs>
+
+                      <g filter="url(#shadow)">
+                        <polygon
+                          points="80,220 256,170 256,460 80,390"
+                          fill="#4caf50"
+                        />
+                        <polygon
+                          points="256,170 432,220 432,390 256,460"
+                          fill="#29b6f6"
+                        />
+                        <polygon
+                          points="130,235 256,195 256,415 130,360"
+                          fill="#ffca28"
+                        />
+                        <polygon
+                          points="256,195 382,235 382,360 256,415"
+                          fill="#ffa726"
+                        />
+                        <polygon
+                          points="80,220 170,255 170,380 80,390"
+                          fill="#26a69a"
+                        />
+                        <polygon
+                          points="342,255 432,220 432,390 342,355"
+                          fill="#ab47bc"
+                        />
+                      </g>
+
+                      <g filter="url(#shadow)">
+                        <path
+                          d="M256,40 C172,40 104,108 104,192 C104,288 256,432 256,432 C256,432 408,288 408,192 C408,108 340,40 256,40 Z"
+                          fill="url(#pinGrad)"
+                        />
+                        <circle
+                          cx="256"
+                          cy="192"
+                          r="56"
+                          fill="#ffffff"
+                          opacity="0.95"
+                        />
+                      </g>
                     </svg>
                   </div>
                   <div className="menu-title-wrapper">

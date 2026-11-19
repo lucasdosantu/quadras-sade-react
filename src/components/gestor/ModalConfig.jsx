@@ -181,21 +181,6 @@ export default function ModalConfig({
           <p className="config-section-title">Exibição</p>
           <div className="config-switch-container">
             <span className="config-switch-label">
-              Ocultar valores sensíveis (Modo Privacidade)
-            </span>
-            <div
-              onClick={() =>
-                setConfig({ ...config, hideAmounts: !config.hideAmounts })
-              }
-              className={`switch-track ${config.hideAmounts ? "ativo" : ""}`}
-            >
-              <div
-                className={`switch-thumb ${config.hideAmounts ? "ativo" : ""}`}
-              />
-            </div>
-          </div>
-          <div className="config-switch-container" style={{ marginTop: 8 }}>
-            <span className="config-switch-label">
               Ocultar centavos na exibição
             </span>
             <div
