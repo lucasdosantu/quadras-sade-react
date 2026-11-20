@@ -3,6 +3,7 @@ import HeaderGestor from "./HeaderGestor";
 
 export default function TabResumo({
   currentMonth,
+  onChangeMonth,
   onOpenMenu,
   hideAmounts,
   onToggleHideAmounts,
@@ -15,7 +16,8 @@ export default function TabResumo({
     <section className="tab-content">
       <HeaderGestor
         title="Resumo Mensal"
-        subtitle={currentMonth}
+        currentMonth={currentMonth}
+        onMonthChange={onChangeMonth}
         onOpenMenu={onOpenMenu}
         hideAmounts={hideAmounts}
         onToggleHideAmounts={onToggleHideAmounts}

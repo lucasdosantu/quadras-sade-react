@@ -1,8 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { baseDeDados } from "../../data/baseDeDados";
 
 const VERSAO_ATUAL = __APP_VERSION__;
+const CFG_STORAGE_KEY = "gestao_config_v1";
+const THEME_SYNC_EVENT = "sade-theme-sync";
+
+function lerModoNoturnoCompartilhado(fallback = false) {
+  try {
+    const cfg = JSON.parse(localStorage.getItem(CFG_STORAGE_KEY) || "{}");
+    if (typeof cfg.theme === "string") {
+      return cfg.theme === "dark" || cfg.theme === "oled";
+    }
+  } catch {}
+  return Boolean(fallback);
+}
+
+function salvarModoNoturnoCompartilhado(isDark) {
+  try {
+    const cfg = JSON.parse(localStorage.getItem(CFG_STORAGE_KEY) || "{}");
+    const nextTheme = isDark ? "dark" : "light";
+    const updated = { ...cfg, theme: nextTheme };
+    localStorage.setItem(CFG_STORAGE_KEY, JSON.stringify(updated));
+    window.dispatchEvent(
+      new CustomEvent(THEME_SYNC_EVENT, {
+        detail: { theme: nextTheme, isDark },
+      }),
+    );
+  } catch {}
+}
 
 export default function MenuLateral({
   aberto,
@@ -13,9 +39,52 @@ export default function MenuLateral({
   onLimparRota,
 }) {
   const [modalGuiaAberto, setModalGuiaAberto] = useState(false);
+  const [darkAtivo, setDarkAtivo] = useState(() =>
+    lerModoNoturnoCompartilhado(modoNoturno),
+  );
+
+  useEffect(() => {
+    setDarkAtivo(lerModoNoturnoCompartilhado(modoNoturno));
+  }, [modoNoturno, aberto]);
+
+  useEffect(() => {
+    const handleSync = (event) => {
+      if (typeof event.detail?.isDark === "boolean") {
+        setDarkAtivo(event.detail.isDark);
+      } else {
+        setDarkAtivo(lerModoNoturnoCompartilhado(modoNoturno));
+      }
+    };
+
+    const handleStorage = (e) => {
+      if (e.key === CFG_STORAGE_KEY) {
+        setDarkAtivo(lerModoNoturnoCompartilhado(modoNoturno));
+      }
+    };
+
+    window.addEventListener(THEME_SYNC_EVENT, handleSync);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener(THEME_SYNC_EVENT, handleSync);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, [modoNoturno]);
+
+  const handleToggleDark = () => {
+    const nextDark = !darkAtivo;
+    setDarkAtivo(nextDark);
+    salvarModoNoturnoCompartilhado(nextDark);
+    if (onAlternarModoNoturno) {
+      onAlternarModoNoturno(nextDark);
+    }
+  };
 
   const verificarAtualizacoes = () => {
+    const savedCfg = localStorage.getItem(CFG_STORAGE_KEY);
     localStorage.clear();
+    if (savedCfg) {
+      localStorage.setItem(CFG_STORAGE_KEY, savedCfg);
+    }
     window.location.reload(true);
   };
 
@@ -24,7 +93,7 @@ export default function MenuLateral({
       {aberto && (
         <div className="menu-overlay" onClick={onFechar}>
           <div
-            className={`menu-content ${modoNoturno ? "dark" : "light"}`}
+            className={`menu-content ${darkAtivo ? "dark" : "light"}`}
             onClick={(e) => e.stopPropagation()}
           >
             <div>
@@ -127,7 +196,7 @@ export default function MenuLateral({
               </div>
 
               <div className="menu-section-divider">
-                <div onClick={onAlternarModoNoturno} className="menu-item-row">
+                <div onClick={handleToggleDark} className="menu-item-row">
                   <div className="menu-item-left">
                     <span className="menu-icon-yellow">
                       <svg
@@ -146,7 +215,7 @@ export default function MenuLateral({
                     </span>
                     <span className="menu-item-label">Modo Noturno</span>
                   </div>
-                  <SwitchVisual ativo={modoNoturno} />
+                  <SwitchVisual ativo={darkAtivo} />
                 </div>
               </div>
 
@@ -327,7 +396,7 @@ export default function MenuLateral({
           onClick={() => setModalGuiaAberto(false)}
         >
           <div
-            className={`modal-content ${modoNoturno ? "dark" : "light"}`}
+            className={`modal-content ${darkAtivo ? "dark" : "light"}`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal-header-box">

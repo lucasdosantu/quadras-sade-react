@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 
 export default function TabHistorico({
   currentMonth,
@@ -14,6 +14,55 @@ export default function TabHistorico({
   openEditModal,
   deleteAccount,
 }) {
+  const [sortField, setSortField] = useState("date");
+  const [sortDirection, setSortDirection] = useState("asc");
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedAccounts = useMemo(() => {
+    const list = [...filteredAccounts];
+    list.sort((a, b) => {
+      let comparison = 0;
+
+      if (sortField === "paid") {
+        comparison = Number(a.paid) - Number(b.paid);
+      } else if (sortField === "date") {
+        comparison = (a.date || "").localeCompare(b.date || "");
+      } else if (sortField === "description") {
+        comparison = (a.description || "").localeCompare(
+          b.description || "",
+          "pt-BR",
+          { sensitivity: "base" },
+        );
+      } else if (sortField === "amount") {
+        comparison = (parseFloat(a.amount) || 0) - (parseFloat(b.amount) || 0);
+      }
+
+      if (comparison === 0 && sortField !== "date") {
+        comparison = (a.date || "").localeCompare(b.date || "");
+      }
+
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+    return list;
+  }, [filteredAccounts, sortField, sortDirection]);
+
+  const renderSortIndicator = (field) => {
+    if (sortField !== field) return null;
+    return (
+      <span className="sort-indicator">
+        {sortDirection === "asc" ? " ▲" : " ▼"}
+      </span>
+    );
+  };
+
   return (
     <section className="tab-content" style={{ overflow: "hidden" }}>
       <div className="card-header">
@@ -109,22 +158,46 @@ export default function TabHistorico({
         <table>
           <thead>
             <tr>
-              <th className="th-center">Pago</th>
-              <th>Data</th>
-              <th>Descrição</th>
-              <th>Valor</th>
+              <th
+                onClick={() => handleSort("paid")}
+                className="th-center th-sortable"
+                title="Ordenar por Pago"
+              >
+                Pago{renderSortIndicator("paid")}
+              </th>
+              <th
+                onClick={() => handleSort("date")}
+                className="th-sortable"
+                title="Ordenar por Data"
+              >
+                Data{renderSortIndicator("date")}
+              </th>
+              <th
+                onClick={() => handleSort("description")}
+                className="th-sortable"
+                title="Ordenar por Descrição"
+              >
+                Descrição{renderSortIndicator("description")}
+              </th>
+              <th
+                onClick={() => handleSort("amount")}
+                className="th-sortable"
+                title="Ordenar por Valor"
+              >
+                Valor{renderSortIndicator("amount")}
+              </th>
               <th className="th-right">Ação</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAccounts.length === 0 ? (
+            {sortedAccounts.length === 0 ? (
               <tr>
                 <td colSpan="5" className="td-empty">
                   Nenhum registro encontrado.
                 </td>
               </tr>
             ) : (
-              filteredAccounts.map((acc) => {
+              sortedAccounts.map((acc) => {
                 const status = getAccountStatus(acc.date, acc.paid);
                 let styleColor = {};
                 if (status === "critical")

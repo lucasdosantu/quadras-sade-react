@@ -16,6 +16,14 @@ import {
 const STORAGE_KEY = "gestao_financeira_v1";
 const CAT_STORAGE_KEY = "gestao_categorias_v1";
 const CFG_STORAGE_KEY = "gestao_config_v1";
+const THEME_SYNC_EVENT = "sade-theme-sync";
+
+const formatLocalDate = (dateObj) => {
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const d = String(dateObj.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
 
 export default function GestorGastos() {
   const [accounts, setAccounts] = useState(
@@ -55,7 +63,7 @@ export default function GestorGastos() {
   });
 
   const now = new Date();
-  const todayStr = now.toISOString().substring(0, 10);
+  const todayStr = formatLocalDate(now);
   const currentMonthStr = todayStr.substring(0, 7);
 
   const [currentMonth, setCurrentMonth] = useState(currentMonthStr);
@@ -69,7 +77,6 @@ export default function GestorGastos() {
     amount: "",
   });
 
-  // Modais e Calculadora
   const [modalEditOpen, setModalEditOpen] = useState(false);
   const [editData, setEditData] = useState({
     id: "",
@@ -83,10 +90,7 @@ export default function GestorGastos() {
   const [modalCatOpen, setModalCatOpen] = useState(false);
 
   const [calcState, setCalcState] = useState("closed");
-  const [calcPos, setCalcPos] = useState({
-    x: window.innerWidth - 240,
-    y: window.innerHeight - 340,
-  });
+  const [calcPos, setCalcPos] = useState(null);
   const draggingRef = useRef(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const [calcDisplay, setCalcDisplay] = useState("0");
@@ -104,27 +108,89 @@ export default function GestorGastos() {
   }, [accounts]);
 
   useEffect(() => {
+    localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(categories));
+  }, [categories]);
+
+  useEffect(() => {
     localStorage.setItem(CFG_STORAGE_KEY, JSON.stringify(config));
     document.body.className = "";
     if (config.theme === "light") document.body.classList.add("theme-light");
     if (config.theme === "oled") document.body.classList.add("theme-oled");
+    window.dispatchEvent(
+      new CustomEvent(THEME_SYNC_EVENT, {
+        detail: {
+          theme: config.theme,
+          isDark: config.theme === "dark" || config.theme === "oled",
+        },
+      }),
+    );
   }, [config]);
 
+  useEffect(() => {
+    const handleExternalThemeSync = (event) => {
+      const nextTheme = event.detail?.theme;
+      if (nextTheme && ["dark", "light", "oled"].includes(nextTheme)) {
+        setConfig((prev) =>
+          prev.theme === nextTheme ? prev : { ...prev, theme: nextTheme },
+        );
+      }
+    };
+
+    const handleStorageChange = (e) => {
+      if (e.key === CFG_STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed?.theme) {
+            setConfig((prev) =>
+              prev.theme === parsed.theme ? prev : { ...prev, ...parsed },
+            );
+          }
+        } catch {}
+      }
+    };
+
+    window.addEventListener(THEME_SYNC_EVENT, handleExternalThemeSync);
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener(THEME_SYNC_EVENT, handleExternalThemeSync);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
   const handleDragStart = (e) => {
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const currentX = calcPos ? calcPos.x : rect.left;
+    const currentY = calcPos ? calcPos.y : rect.top;
+
+    if (!calcPos) {
+      setCalcPos({ x: currentX, y: currentY });
+    }
+
     draggingRef.current = true;
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-    dragOffsetRef.current = { x: clientX - calcPos.x, y: clientY - calcPos.y };
+    dragOffsetRef.current = { x: clientX - currentX, y: clientY - currentY };
   };
 
   const handleDragMove = (e) => {
     if (!draggingRef.current) return;
-    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-    setCalcPos({
-      x: clientX - dragOffsetRef.current.x,
-      y: clientY - dragOffsetRef.current.y,
-    });
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
+    if (clientX === undefined || clientY === undefined) return;
+
+    const maxX = Math.max(8, window.innerWidth - 56);
+    const maxY = Math.max(8, window.innerHeight - 56);
+    const nextX = Math.min(
+      Math.max(8, clientX - dragOffsetRef.current.x),
+      maxX,
+    );
+    const nextY = Math.min(
+      Math.max(8, clientY - dragOffsetRef.current.y),
+      maxY,
+    );
+
+    setCalcPos({ x: nextX, y: nextY });
   };
 
   const handleDragEnd = () => {
@@ -134,7 +200,7 @@ export default function GestorGastos() {
   useEffect(() => {
     window.addEventListener("mousemove", handleDragMove);
     window.addEventListener("mouseup", handleDragEnd);
-    window.addEventListener("touchmove", handleDragMove);
+    window.addEventListener("touchmove", handleDragMove, { passive: false });
     window.addEventListener("touchend", handleDragEnd);
     return () => {
       window.removeEventListener("mousemove", handleDragMove);
@@ -157,15 +223,13 @@ export default function GestorGastos() {
   };
 
   const parseMoneyValue = (val) => {
+    if (typeof val === "number") return isNaN(val) ? 0 : val;
     if (!val) return 0;
-    return (
-      parseFloat(
-        val
-          .toString()
-          .replace(/[^\d,]/g, "")
-          .replace(",", "."),
-      ) || 0
-    );
+    const str = val.toString().trim();
+    if (str.includes(",")) {
+      return parseFloat(str.replace(/[^\d,-]/g, "").replace(",", ".")) || 0;
+    }
+    return parseFloat(str.replace(/[^\d.-]/g, "")) || 0;
   };
 
   const formatDisplayMoney = (val) => {
@@ -188,7 +252,11 @@ export default function GestorGastos() {
     }));
   };
 
-  const changeMonth = (delta) => {
+  const changeMonth = (delta, isDirect = false) => {
+    if (isDirect && typeof delta === "string") {
+      if (delta) setCurrentMonth(delta);
+      return;
+    }
     const [year, month] = currentMonth.split("-").map(Number);
     const newDate = new Date(year, month - 1 + delta, 1);
     setCurrentMonth(
@@ -227,6 +295,25 @@ export default function GestorGastos() {
   const deleteAccount = (id) => {
     if (window.confirm("Deseja realmente apagar esta conta?")) {
       setAccounts(accounts.filter((acc) => acc.id !== id));
+    }
+  };
+
+  const clearAllAccounts = () => {
+    if (accounts.length === 0) {
+      alert("Não há registros para excluir.");
+      return;
+    }
+
+    const confirmacao = window.prompt(
+      "ATENÇÃO: Todos os registros serão excluídos permanentemente.\n\nPara confirmar, digite EXCLUIR:",
+    );
+
+    if (confirmacao === "EXCLUIR") {
+      setAccounts([]);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      alert("Todos os registros foram excluídos com sucesso.");
+    } else if (confirmacao !== null) {
+      alert('Ação cancelada. Você precisa digitar exatamente "EXCLUIR".');
     }
   };
 
@@ -296,32 +383,108 @@ export default function GestorGastos() {
   };
 
   const importJSON = (e) => {
+    const input = e.target;
+    const file = input.files?.[0];
+    if (!file) return;
+
     const fileReader = new FileReader();
-    if (e.target.files[0]) {
-      fileReader.readAsText(e.target.files[0], "UTF-8");
-      fileReader.onload = (event) => {
-        try {
-          const importedData = JSON.parse(event.target.result);
-          if (Array.isArray(importedData)) {
-            const opcao = window.prompt(
-              "Deseja SOBRESCREVER os dados atuais ou ADICIONAR os novos dados?\nDigite '1' para Sobrescrever ou '2' para Adicionar:",
-              "2",
-            );
-            if (opcao === "1") {
-              setAccounts(importedData);
-              alert("Dados sobrescritos com sucesso!");
-            } else if (opcao === "2") {
-              setAccounts([...accounts, ...importedData]);
-              alert("Dados adicionados com sucesso!");
-            }
-          } else {
-            alert("Arquivo JSON inválido.");
-          }
-        } catch {
-          alert("Erro ao ler o arquivo JSON.");
+    fileReader.readAsText(file, "UTF-8");
+    fileReader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+        const rawList = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed?.accounts)
+            ? parsed.accounts
+            : null;
+
+        if (!rawList) {
+          alert("Arquivo JSON inválido. Estrutura de contas não encontrada.");
+          input.value = "";
+          return;
         }
-      };
-    }
+
+        const normalizedData = rawList
+          .filter((item) => item && item.date && item.description !== undefined)
+          .map((item, idx) => ({
+            id:
+              item.id ||
+              (crypto.randomUUID
+                ? crypto.randomUUID()
+                : `${Date.now().toString(36)}_${idx}`),
+            date: String(item.date).substring(0, 10),
+            description: String(item.description).trim(),
+            category: item.category ? String(item.category).trim() : "",
+            amount: parseMoneyValue(item.amount),
+            paid: Boolean(item.paid),
+          }));
+
+        if (normalizedData.length === 0) {
+          alert("Nenhum registro válido encontrado no arquivo JSON.");
+          input.value = "";
+          return;
+        }
+
+        const importedCategories = new Set();
+        if (Array.isArray(parsed?.categories)) {
+          parsed.categories.forEach((cat) => {
+            if (cat && String(cat).trim()) {
+              importedCategories.add(String(cat).trim());
+            }
+          });
+        }
+        normalizedData.forEach((acc) => {
+          if (acc.category) {
+            importedCategories.add(acc.category);
+          }
+        });
+
+        const opcao = window.prompt(
+          `${normalizedData.length} registros prontos para importar.\nDeseja SOBRESCREVER os dados atuais ou ADICIONAR os novos dados?\nDigite '1' para Sobrescrever ou '2' para Adicionar:`,
+          "2",
+        );
+
+        if (opcao === "1") {
+          setAccounts(normalizedData);
+          if (importedCategories.size > 0) {
+            const mergedCats = Array.from(
+              new Set([...categories, ...importedCategories]),
+            );
+            setCategories(mergedCats);
+            localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(mergedCats));
+          }
+          alert("Dados sobrescritos com sucesso!");
+        } else if (opcao === "2") {
+          const existingIds = new Set(accounts.map((a) => a.id));
+          const merged = [
+            ...accounts,
+            ...normalizedData.map((item) =>
+              existingIds.has(item.id)
+                ? {
+                    ...item,
+                    id: crypto.randomUUID
+                      ? crypto.randomUUID()
+                      : `${item.id}_${Date.now()}`,
+                  }
+                : item,
+            ),
+          ];
+          setAccounts(merged);
+          if (importedCategories.size > 0) {
+            const mergedCats = Array.from(
+              new Set([...categories, ...importedCategories]),
+            );
+            setCategories(mergedCats);
+            localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(mergedCats));
+          }
+          alert("Dados adicionados com sucesso!");
+        }
+      } catch {
+        alert("Erro ao ler o arquivo JSON.");
+      } finally {
+        input.value = "";
+      }
+    };
   };
 
   const exportCSV = () => {
@@ -343,34 +506,48 @@ export default function GestorGastos() {
     const [year, month] = yearMonth.split("-").map(Number);
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
-    let weeks = [];
-    let current = new Date(firstDay);
 
+    let weekStartDay = 1;
+    if (config.startOfWeek === "Domingo") {
+      weekStartDay = 0;
+    } else if (config.startOfWeek === "Sábado") {
+      weekStartDay = 6;
+    }
+
+    const diffFromStart = (firstDay.getDay() - weekStartDay + 7) % 7;
+    const firstWeekStart = new Date(firstDay);
+    firstWeekStart.setDate(firstDay.getDate() - diffFromStart);
+
+    const weeks = [];
+    let currentStart = new Date(firstWeekStart);
     let weekNum = 1;
-    while (current <= lastDay) {
-      let startWeek = new Date(current);
-      let endWeek = new Date(current);
-      endWeek.setDate(endWeek.getDate() + 6);
-      if (endWeek > lastDay) endWeek = new Date(lastDay);
+
+    while (currentStart <= lastDay) {
+      const currentEnd = new Date(currentStart);
+      currentEnd.setDate(currentStart.getDate() + 6);
 
       weeks.push({
         num: weekNum++,
-        start: startWeek.toISOString().substring(0, 10),
-        end: endWeek.toISOString().substring(0, 10),
+        start: formatLocalDate(currentStart),
+        end: formatLocalDate(currentEnd),
       });
-      current.setDate(current.getDate() + 7);
+
+      const nextStart = new Date(currentStart);
+      nextStart.setDate(currentStart.getDate() + 7);
+      currentStart = nextStart;
     }
+
     return weeks;
   };
 
   const filteredAccounts = accounts.filter(
-    (acc) => acc.date.substring(0, 7) === currentMonth,
+    (acc) => acc.date && acc.date.substring(0, 7) === currentMonth,
   );
   let unpaidSum = 0,
     paidSum = 0;
   filteredAccounts.forEach((acc) => {
-    if (acc.paid) paidSum += parseFloat(acc.amount);
-    else unpaidSum += parseFloat(acc.amount);
+    if (acc.paid) paidSum += parseFloat(acc.amount) || 0;
+    else unpaidSum += parseFloat(acc.amount) || 0;
   });
 
   const isDark = config.theme === "dark" || config.theme === "oled";
@@ -396,6 +573,7 @@ export default function GestorGastos() {
         {activeTab === "resumo" && (
           <TabResumo
             currentMonth={currentMonth}
+            onChangeMonth={changeMonth}
             onOpenMenu={() => setMenuAberto(true)}
             hideAmounts={config.hideAmounts}
             onToggleHideAmounts={toggleHideAmounts}
@@ -444,13 +622,14 @@ export default function GestorGastos() {
         onExportJSON={exportJSON}
         onImportJSON={importJSON}
         onExportCSV={exportCSV}
+        onClearAllAccounts={clearAllAccounts}
       />
 
       <ModalMetas
         isOpen={modalMetasOpen}
         onClose={() => setModalMetasOpen(false)}
         currentMonth={currentMonth}
-        filteredAccounts={filteredAccounts}
+        accounts={accounts}
         getWeeksInMonth={getWeeksInMonth}
         config={config}
         formatDisplayMoney={formatDisplayMoney}

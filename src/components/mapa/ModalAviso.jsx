@@ -1,15 +1,53 @@
 import React, { useState, useEffect } from "react";
 
 const VERSAO_SISTEMA = __APP_VERSION__;
+const CFG_STORAGE_KEY = "gestao_config_v1";
+const THEME_SYNC_EVENT = "sade-theme-sync";
+
+function lerModoNoturnoSalvo() {
+  try {
+    const cfg = JSON.parse(localStorage.getItem(CFG_STORAGE_KEY) || "{}");
+    if (typeof cfg.theme === "string") {
+      return cfg.theme === "dark" || cfg.theme === "oled";
+    }
+  } catch {}
+  return false;
+}
 
 export default function ModalAviso() {
   const [mostrar, setMostrar] = useState(false);
+  const [modoNoturno, setModoNoturno] = useState(() => lerModoNoturnoSalvo());
 
   useEffect(() => {
     const versaoLida = localStorage.getItem("versaoAvisoLido");
     if (versaoLida !== VERSAO_SISTEMA) {
       setMostrar(true);
     }
+  }, []);
+
+  useEffect(() => {
+    setModoNoturno(lerModoNoturnoSalvo());
+
+    const handleSync = (event) => {
+      if (typeof event.detail?.isDark === "boolean") {
+        setModoNoturno(event.detail.isDark);
+      } else {
+        setModoNoturno(lerModoNoturnoSalvo());
+      }
+    };
+
+    const handleStorage = (e) => {
+      if (e.key === CFG_STORAGE_KEY) {
+        setModoNoturno(lerModoNoturnoSalvo());
+      }
+    };
+
+    window.addEventListener(THEME_SYNC_EVENT, handleSync);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener(THEME_SYNC_EVENT, handleSync);
+      window.removeEventListener("storage", handleStorage);
+    };
   }, []);
 
   const fechar = () => {
@@ -21,7 +59,7 @@ export default function ModalAviso() {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content light">
+      <div className={`modal-content ${modoNoturno ? "dark" : "light"}`}>
         <div className="modal-header-box">
           <span className="modal-aviso-icone">📢</span>
           <h3 className="modal-title-text">Aviso Importante</h3>

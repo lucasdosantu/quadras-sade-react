@@ -4,3 +4,7 @@ export { default as PainelRota } from "./PainelRota";
 export { default as BannerAnuncios } from "./BannerAnuncios";
 export { default as ModalAviso } from "./ModalAviso";
 export { default as MenuLateral } from "./MenuLateral";
+export { default as ControlesMapa } from "./ControlesMapa";
+export { default as CardQuadra } from "./CardQuadra";
+export { default as CardSugestao } from "./CardSugestao";
+export { criarIconeQuadraSvg, encontrarQuadraProxima } from "./pinosMapa";

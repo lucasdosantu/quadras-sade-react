@@ -1,10 +1,20 @@
 import React from "react";
 
+const WEEKDAY_NAMES = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+const formatDateWithWeekday = (isoDateStr) => {
+  if (!isoDateStr) return "";
+  const [y, m, d] = isoDateStr.split("-").map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  const weekday = WEEKDAY_NAMES[dateObj.getDay()];
+  return `${weekday}, ${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}/${y}`;
+};
+
 export default function ModalMetas({
   isOpen,
   onClose,
   currentMonth,
-  filteredAccounts,
+  accounts,
   getWeeksInMonth,
   config,
   formatDisplayMoney,
@@ -12,6 +22,8 @@ export default function ModalMetas({
   paidSum,
 }) {
   if (!isOpen) return null;
+
+  const weeks = getWeeksInMonth(currentMonth);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -27,12 +39,13 @@ export default function ModalMetas({
         </div>
 
         <div className="modal-body-scroll">
-          {getWeeksInMonth(currentMonth).map((week) => {
-            const weekAccounts = filteredAccounts.filter(
-              (acc) => acc.date >= week.start && acc.date <= week.end,
+          {weeks.map((week) => {
+            const weekAccounts = accounts.filter(
+              (acc) =>
+                acc.date && acc.date >= week.start && acc.date <= week.end,
             );
             const weekSum = weekAccounts.reduce(
-              (acc, curr) => acc + parseFloat(curr.amount),
+              (acc, curr) => acc + (parseFloat(curr.amount) || 0),
               0,
             );
             const metaDiaria =
@@ -46,8 +59,8 @@ export default function ModalMetas({
                 <div className="meta-week-header">
                   <span>SEMANA {week.num}</span>
                   <span className="meta-week-dates">
-                    {week.start.split("-").reverse().join("/")} a{" "}
-                    {week.end.split("-").reverse().join("/")}
+                    {formatDateWithWeekday(week.start)} a{" "}
+                    {formatDateWithWeekday(week.end)}
                   </span>
                 </div>
                 <p className="meta-week-total">
@@ -88,9 +101,12 @@ export default function ModalMetas({
               <span className="meta-label-sm">MÉDIA DIÁRIA C/ RESERVA</span>
               <span className="meta-total-val text-success">
                 {formatDisplayMoney(
-                  ((unpaidSum + paidSum) * (1 + config.reservePercent / 100)) /
-                    config.workDays /
-                    getWeeksInMonth(currentMonth).length,
+                  config.workDays > 0 && weeks.length > 0
+                    ? ((unpaidSum + paidSum) *
+                        (1 + config.reservePercent / 100)) /
+                        config.workDays /
+                        weeks.length
+                    : 0,
                 )}
               </span>
             </div>

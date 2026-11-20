@@ -5,7 +5,7 @@ import { Mapa, ModalAviso, BannerAnuncios } from "./components/mapa";
 const GestorGastos = lazy(() => import("./pages/GestorGastos"));
 
 function PaginaMapa() {
-  const [temLocalAberto, setTemLocalAberto] = useState(false);
+  const [temCardAberto, setTemCardAberto] = useState(false);
 
   return (
     <div
@@ -14,11 +14,11 @@ function PaginaMapa() {
     >
       <Mapa
         onMudancaSelecao={(selecionado) =>
-          setTemLocalAberto(Boolean(selecionado))
+          setTemCardAberto(Boolean(selecionado))
         }
       />
       <ModalAviso />
-      {!temLocalAberto && <BannerAnuncios />}
+      <BannerAnuncios ocultar={temCardAberto} />
     </div>
   );
 }

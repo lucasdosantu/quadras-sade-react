@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 
 function avaliarExpressaoMatematica(expressao) {
   const limpa = expressao
@@ -90,6 +90,38 @@ export default function CalculadoraFlutuante({
   calcDisplay,
   setCalcDisplay,
 }) {
+  const startCoordRef = useRef({ x: 0, y: 0 });
+  const movedRef = useRef(false);
+
+  const handlePointerDown = (e) => {
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
+    startCoordRef.current = { x: clientX, y: clientY };
+    movedRef.current = false;
+    onDragStart(e);
+  };
+
+  const handlePointerMove = (e) => {
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX;
+    const clientY = e.clientY ?? e.touches?.[0]?.clientY;
+    if (clientX === undefined || clientY === undefined) return;
+    if (
+      Math.hypot(
+        clientX - startCoordRef.current.x,
+        clientY - startCoordRef.current.y,
+      ) > 5
+    ) {
+      movedRef.current = true;
+    }
+  };
+
+  const handleBubbleClick = () => {
+    if (!movedRef.current) {
+      setCalcState("open");
+    }
+    movedRef.current = false;
+  };
+
   const calcularResultado = () => {
     try {
       setCalcDisplay(avaliarExpressaoMatematica(calcDisplay));
@@ -98,11 +130,21 @@ export default function CalculadoraFlutuante({
     }
   };
 
+  const bubbleStyle = calcPos
+    ? { top: calcPos.y, left: calcPos.x, right: "auto", bottom: "auto" }
+    : { right: 20, bottom: 20 };
+
   if (calcState === "closed") {
     return (
       <button
-        className="calc-open-btn"
-        onClick={() => setCalcState("open")}
+        type="button"
+        className="calc-minimized-floating"
+        style={bubbleStyle}
+        onMouseDown={handlePointerDown}
+        onMouseMove={handlePointerMove}
+        onTouchStart={handlePointerDown}
+        onTouchMove={handlePointerMove}
+        onClick={handleBubbleClick}
         title="Calculadora"
       >
         <svg
@@ -134,10 +176,12 @@ export default function CalculadoraFlutuante({
     return (
       <div
         className="calc-minimized-floating"
-        style={{ top: calcPos.y, left: calcPos.x }}
-        onMouseDown={onDragStart}
-        onTouchStart={onDragStart}
-        onClick={() => setCalcState("open")}
+        style={bubbleStyle}
+        onMouseDown={handlePointerDown}
+        onMouseMove={handlePointerMove}
+        onTouchStart={handlePointerDown}
+        onTouchMove={handlePointerMove}
+        onClick={handleBubbleClick}
         title="Abrir Calculadora"
       >
         <svg
@@ -165,8 +209,12 @@ export default function CalculadoraFlutuante({
     );
   }
 
+  const windowStyle = calcPos
+    ? { top: calcPos.y, left: calcPos.x }
+    : { bottom: 80, right: 20 };
+
   return (
-    <div className="calc-window" style={{ top: calcPos.y, left: calcPos.x }}>
+    <div className="calc-window" style={windowStyle}>
       <div
         className="calc-header"
         onMouseDown={onDragStart}
