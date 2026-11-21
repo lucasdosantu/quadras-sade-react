@@ -669,14 +669,126 @@ thead th {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
-/* Configurações e backup */
+/* Configurações */
+.config-modal-shell {
+  max-width: 500px;
+}
+
+.config-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 4px;
+  margin-bottom: 14px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.config-tab-btn {
+  height: 36px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.config-tab-btn:hover {
+  color: var(--text-primary);
+}
+
+.config-tab-btn.is-active {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.config-body {
+  gap: 12px;
+}
+
+.config-group-card {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 14px;
+}
+
 .config-section-title {
   font-size: 11px;
   font-weight: 800;
   color: var(--accent-blue);
   text-transform: uppercase;
-  margin-top: 12px;
+  letter-spacing: 0.03em;
+  margin: 0 0 10px 0;
+}
+
+.config-alert-row {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
+  align-items: end;
+}
+
+.config-alert-row .config-field-compact,
+.config-alert-row .config-field-color {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.config-alert-row label {
+  display: flex;
+  align-items: flex-end;
+  min-height: 28px;
+  line-height: 1.2;
   margin-bottom: 6px;
+}
+
+.config-alert-row .config-input-reset,
+.config-alert-row .config-color-input {
+  height: 42px;
+  min-height: 42px;
+  max-height: 42px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.config-alert-row .config-color-input {
+  padding: 2px;
+  cursor: pointer;
+}
+
+.config-field-compact {
+  min-width: 0;
+}
+
+.config-field-color {
+  min-width: 0;
+}
+
+.config-input-reset {
+  margin-bottom: 0;
+}
+
+.config-num-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.config-color-input {
+  width: 100%;
+  margin-bottom: 0;
 }
 
 .config-grid-2 {
@@ -689,13 +801,31 @@ thead th {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 4px 0;
 }
 
 .config-switch-label {
-  font-size: 13px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-primary);
+  text-align: left;
+  line-height: 1.35;
+}
+
+.config-switch-btn {
+  padding: 0;
+  cursor: pointer;
+}
+
+.config-spaced-top {
+  margin-top: 12px;
+}
+
+.config-action-btn {
+  width: 100%;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .config-backup-grid {
@@ -705,11 +835,8 @@ thead th {
   margin-top: 4px;
 }
 
-.config-btn-spaced {
-  margin-top: 8px;
-  width: 100%;
-  height: 44px !important;
-  box-sizing: border-box;
+.config-file-hidden {
+  display: none;
 }
 
 .btn-backup-item {
@@ -740,8 +867,54 @@ thead th {
 
 .label-file-custom {
   display: flex;
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
   cursor: pointer;
+}
+
+.config-danger-zone {
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.config-danger-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent-danger);
+  text-transform: uppercase;
+  margin: 0 0 4px 0;
+}
+
+.config-danger-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.config-danger-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--accent-danger);
+  background: transparent;
+  color: var(--accent-danger);
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.config-danger-btn:hover {
+  background: var(--accent-danger);
+  color: #ffffff;
 }
 
 /* Metas semanais */

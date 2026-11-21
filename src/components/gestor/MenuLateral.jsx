@@ -9,6 +9,7 @@ export default function MenuLateral({
   isDark,
   onOpenConfig,
   setActiveTab,
+  onOpenGuia,
 }) {
   if (!isOpen) return null;
 
@@ -173,6 +174,31 @@ export default function MenuLateral({
           </button>
 
           <hr className="menu-separator" />
+
+          <button
+            onClick={() => {
+              onClose();
+              onOpenGuia?.();
+            }}
+            className="menu-item-button"
+          >
+            <span className="menu-item-icon-wrapper">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6366f1"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </span>
+            <span>Guia de Uso</span>
+          </button>
 
           <Link to="/" className="menu-item-button menu-link-fix">
             <span className="menu-item-icon-wrapper">

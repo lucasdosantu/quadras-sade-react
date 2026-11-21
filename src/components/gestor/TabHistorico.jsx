@@ -1,5 +1,25 @@
 import React, { useState, useMemo } from "react";
 
+function MiniTagIcon() {
+  return (
+    <svg
+      width="11"
+      height="11"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flexShrink: 0 }}
+      aria-hidden="true"
+    >
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+    </svg>
+  );
+}
+
 export default function TabHistorico({
   currentMonth,
   onChangeMonth,
@@ -205,6 +225,8 @@ export default function TabHistorico({
                 if (status === "warning")
                   styleColor = { color: config.warningColor, fontWeight: 800 };
 
+                const categoriaTexto = acc.category?.trim();
+
                 return (
                   <tr key={acc.id} className={acc.paid ? "row-paid" : ""}>
                     <td className="td-center">
@@ -225,7 +247,38 @@ export default function TabHistorico({
                       style={styleColor}
                       className={acc.paid ? "paid-text" : ""}
                     >
-                      {acc.description}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: "4px",
+                        }}
+                      >
+                        <span>{acc.description}</span>
+                        {categoriaTexto && (
+                          <span
+                            className="categoria-etiqueta"
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              padding: "2px 6px",
+                              borderRadius: "6px",
+                              fontSize: "10.5px",
+                              fontWeight: 600,
+                              lineHeight: 1.2,
+                              border: "1px solid rgba(148, 163, 184, 0.35)",
+                              backgroundColor: "rgba(148, 163, 184, 0.14)",
+                              color: "inherit",
+                              opacity: acc.paid ? 0.75 : 0.92,
+                            }}
+                          >
+                            <MiniTagIcon />
+                            <span>{categoriaTexto}</span>
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td
                       style={styleColor}

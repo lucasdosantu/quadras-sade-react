@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { baseDeDados } from "../../data/baseDeDados";
@@ -10,6 +11,7 @@ import PainelRota from "./PainelRota";
 import ControlesMapa from "./ControlesMapa";
 import CardQuadra from "./CardQuadra";
 import CardSugestao from "./CardSugestao";
+import GuiaUsoMapa from "./GuiaUsoMapa";
 import { criarIconeQuadraSvg, encontrarQuadraProxima } from "./pinosMapa";
 
 const CFG_STORAGE_KEY = "gestao_config_v1";
@@ -44,6 +46,7 @@ function salvarModoNoturnoSalvo(isDark) {
 }
 
 export default function Mapa({ onMudancaSelecao }) {
+  const navigate = useNavigate();
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const marcadorAtualRef = useRef(null);
@@ -56,6 +59,7 @@ export default function Mapa({ onMudancaSelecao }) {
   const [pontoSugestao, setPontoSugestao] = useState(null);
   const [tipoCamada, setTipoCamada] = useState("rua");
   const [menuAberto, setMenuAberto] = useState(false);
+  const [guiaAberto, setGuiaAberto] = useState(false);
   const [modoNoturno, setModoNoturno] = useState(() => lerModoNoturnoSalvo());
   const [modoSugestao, setModoSugestao] = useState(false);
 
@@ -114,7 +118,10 @@ export default function Mapa({ onMudancaSelecao }) {
   useEffect(() => {
     if (!onMudancaSelecao) return;
     const temOverlayAtivo = Boolean(
-      localSelecionado || (modoSugestao && pontoSugestao) || menuAberto,
+      localSelecionado ||
+      (modoSugestao && pontoSugestao) ||
+      menuAberto ||
+      guiaAberto,
     );
     onMudancaSelecao(temOverlayAtivo);
   }, [
@@ -122,6 +129,7 @@ export default function Mapa({ onMudancaSelecao }) {
     modoSugestao,
     pontoSugestao,
     menuAberto,
+    guiaAberto,
     onMudancaSelecao,
   ]);
 
@@ -420,6 +428,7 @@ export default function Mapa({ onMudancaSelecao }) {
         onAtivarModoSugestao={ativarModoSugestao}
         onReportarErro={reportarErro}
         onLimparRota={limparRota}
+        onAbrirGuiaUso={() => setGuiaAberto(true)}
       />
 
       <PainelRota
@@ -446,15 +455,13 @@ export default function Mapa({ onMudancaSelecao }) {
 
       <div
         ref={mapRef}
+        className={`mapa-viewport ${modoNoturno ? "is-dark" : ""} ${
+          tipoCamada === "satelite" ? "is-satellite" : ""
+        }`}
         style={{
           width: "100%",
           height: "100%",
-          filter: !modoNoturno
-            ? "none"
-            : tipoCamada === "satelite"
-              ? "brightness(0.62) contrast(1.05)"
-              : "invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)",
-          transition: "filter 0.5s ease",
+          backgroundColor: modoNoturno ? "#09090b" : "#ffffff",
         }}
       />
 
@@ -484,6 +491,16 @@ export default function Mapa({ onMudancaSelecao }) {
           onAdicionarRota={adicionarARota}
         />
       )}
+
+      <GuiaUsoMapa
+        isOpen={guiaAberto}
+        onClose={() => setGuiaAberto(false)}
+        onOpenGestorGastos={() => navigate("/gastos")}
+        theme={modoNoturno ? "dark" : "light"}
+        localSelecionado={localSelecionado}
+        pontosDaRotaCount={pontosDaRota.length}
+        menuAberto={menuAberto}
+      />
     </div>
   );
 }

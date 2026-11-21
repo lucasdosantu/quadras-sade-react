@@ -7,3 +7,4 @@ export { default as ModalConfig } from "./ModalConfig";
 export { default as ModalMetas } from "./ModalMetas";
 export { default as ModalEdicao } from "./ModalEdicao";
 export { default as ModalCategorias } from "./ModalCategorias";
+export { default as GuiaUsoGestor } from "./GuiaUsoGestor";

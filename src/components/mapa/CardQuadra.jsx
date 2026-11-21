@@ -22,6 +22,7 @@ export default function CardQuadra({
 
   return (
     <div
+      className="card-quadra-container"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

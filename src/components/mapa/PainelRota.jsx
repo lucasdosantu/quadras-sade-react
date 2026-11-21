@@ -17,6 +17,7 @@ export default function PainelRota({
 
   return (
     <div
+      className="painel-rota-container"
       style={{
         position: "absolute",
         top: "76px",

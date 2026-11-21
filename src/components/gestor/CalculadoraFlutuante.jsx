@@ -86,6 +86,7 @@ export default function CalculadoraFlutuante({
   calcState,
   setCalcState,
   calcPos,
+  onResetPos,
   onDragStart,
   calcDisplay,
   setCalcDisplay,
@@ -98,7 +99,7 @@ export default function CalculadoraFlutuante({
     const clientY = e.clientY ?? e.touches?.[0]?.clientY ?? 0;
     startCoordRef.current = { x: clientX, y: clientY };
     movedRef.current = false;
-    onDragStart(e);
+    onDragStart?.(e);
   };
 
   const handlePointerMove = (e) => {
@@ -117,6 +118,7 @@ export default function CalculadoraFlutuante({
 
   const handleBubbleClick = () => {
     if (!movedRef.current) {
+      onResetPos?.();
       setCalcState("open");
     }
     movedRef.current = false;
@@ -210,8 +212,8 @@ export default function CalculadoraFlutuante({
   }
 
   const windowStyle = calcPos
-    ? { top: calcPos.y, left: calcPos.x }
-    : { bottom: 80, right: 20 };
+    ? { top: calcPos.y, left: calcPos.x, transform: "none" }
+    : undefined;
 
   return (
     <div className="calc-window" style={windowStyle}>
@@ -237,7 +239,11 @@ export default function CalculadoraFlutuante({
           <span>Calculadora</span>
         </div>
         <div className="calc-controls">
-          <button onClick={() => setCalcState("minimized")} title="Minimizar">
+          <button
+            type="button"
+            onClick={() => setCalcState("minimized")}
+            title="Minimizar"
+          >
             <svg
               width="12"
               height="12"
@@ -249,7 +255,11 @@ export default function CalculadoraFlutuante({
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
           </button>
-          <button onClick={() => setCalcState("closed")} title="Fechar">
+          <button
+            type="button"
+            onClick={() => setCalcState("closed")}
+            title="Fechar"
+          >
             <svg
               width="12"
               height="12"
@@ -272,22 +282,29 @@ export default function CalculadoraFlutuante({
           value={calcDisplay}
         />
         <div className="calc-buttons">
-          <button onClick={() => setCalcDisplay("0")} className="btn-tool">
+          <button
+            type="button"
+            onClick={() => setCalcDisplay("0")}
+            className="btn-tool"
+          >
             C
           </button>
           <button
+            type="button"
             onClick={() => setCalcDisplay(calcDisplay + "/")}
             className="btn-op"
           >
             ÷
           </button>
           <button
+            type="button"
             onClick={() => setCalcDisplay(calcDisplay + "*")}
             className="btn-op"
           >
             ×
           </button>
           <button
+            type="button"
             onClick={() => setCalcDisplay(calcDisplay.slice(0, -1) || "0")}
             className="btn-tool"
           >
@@ -297,6 +314,7 @@ export default function CalculadoraFlutuante({
           {["7", "8", "9", "-", "4", "5", "6", "+", "1", "2", "3"].map(
             (val) => (
               <button
+                type="button"
                 key={val}
                 onClick={() =>
                   setCalcDisplay(calcDisplay === "0" ? val : calcDisplay + val)
@@ -306,10 +324,15 @@ export default function CalculadoraFlutuante({
               </button>
             ),
           )}
-          <button onClick={calcularResultado} className="btn-equal">
+          <button
+            type="button"
+            onClick={calcularResultado}
+            className="btn-equal"
+          >
             =
           </button>
           <button
+            type="button"
             onClick={() =>
               setCalcDisplay(calcDisplay === "0" ? "0" : calcDisplay + "0")
             }
@@ -318,6 +341,7 @@ export default function CalculadoraFlutuante({
             0
           </button>
           <button
+            type="button"
             onClick={() => setCalcDisplay(calcDisplay + ".")}
             className="btn-num"
           >

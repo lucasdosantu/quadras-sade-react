@@ -11,6 +11,7 @@ import {
   ModalMetas,
   ModalEdicao,
   ModalCategorias,
+  GuiaUsoGestor,
 } from "../components/gestor";
 
 const STORAGE_KEY = "gestao_financeira_v1";
@@ -23,6 +24,30 @@ const formatLocalDate = (dateObj) => {
   const m = String(dateObj.getMonth() + 1).padStart(2, "0");
   const d = String(dateObj.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
+};
+
+const mesclarCategorias = (categoriasAtuais, categoriasImportadas) => {
+  const resultado = Array.isArray(categoriasAtuais)
+    ? [...categoriasAtuais]
+    : [];
+  const vistas = new Set(
+    resultado
+      .filter((c) => typeof c === "string")
+      .map((c) => c.trim().toLowerCase()),
+  );
+
+  for (const cat of categoriasImportadas) {
+    if (typeof cat !== "string") continue;
+    const limpa = cat.trim();
+    if (!limpa) continue;
+    const chave = limpa.toLowerCase();
+    if (!vistas.has(chave)) {
+      vistas.add(chave);
+      resultado.push(limpa);
+    }
+  }
+
+  return resultado;
 };
 
 export default function GestorGastos() {
@@ -69,6 +94,8 @@ export default function GestorGastos() {
   const [currentMonth, setCurrentMonth] = useState(currentMonthStr);
   const [activeTab, setActiveTab] = useState(config.defaultTab || "cadastro");
   const [menuAberto, setMenuAberto] = useState(false);
+  const [guiaAberto, setGuiaAberto] = useState(false);
+  const [currentGuiaStepId, setCurrentGuiaStepId] = useState(null);
 
   const [formData, setFormData] = useState({
     date: todayStr,
@@ -425,19 +452,24 @@ export default function GestorGastos() {
           return;
         }
 
-        const importedCategories = new Set();
+        const importedCategories = [];
         if (Array.isArray(parsed?.categories)) {
-          parsed.categories.forEach((cat) => {
-            if (cat && String(cat).trim()) {
-              importedCategories.add(String(cat).trim());
-            }
-          });
+          importedCategories.push(...parsed.categories);
         }
         normalizedData.forEach((acc) => {
           if (acc.category) {
-            importedCategories.add(acc.category);
+            importedCategories.push(acc.category);
           }
         });
+
+        const aplicarCategorias = () => {
+          if (importedCategories.length === 0) return;
+          setCategories((prev) => {
+            const atualizadas = mesclarCategorias(prev, importedCategories);
+            localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(atualizadas));
+            return atualizadas;
+          });
+        };
 
         const opcao = window.prompt(
           `${normalizedData.length} registros prontos para importar.\nDeseja SOBRESCREVER os dados atuais ou ADICIONAR os novos dados?\nDigite '1' para Sobrescrever ou '2' para Adicionar:`,
@@ -446,13 +478,7 @@ export default function GestorGastos() {
 
         if (opcao === "1") {
           setAccounts(normalizedData);
-          if (importedCategories.size > 0) {
-            const mergedCats = Array.from(
-              new Set([...categories, ...importedCategories]),
-            );
-            setCategories(mergedCats);
-            localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(mergedCats));
-          }
+          aplicarCategorias();
           alert("Dados sobrescritos com sucesso!");
         } else if (opcao === "2") {
           const existingIds = new Set(accounts.map((a) => a.id));
@@ -470,13 +496,7 @@ export default function GestorGastos() {
             ),
           ];
           setAccounts(merged);
-          if (importedCategories.size > 0) {
-            const mergedCats = Array.from(
-              new Set([...categories, ...importedCategories]),
-            );
-            setCategories(mergedCats);
-            localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(mergedCats));
-          }
+          aplicarCategorias();
           alert("Dados adicionados com sucesso!");
         }
       } catch {
@@ -539,6 +559,77 @@ export default function GestorGastos() {
 
     return weeks;
   };
+
+  const handleGuiaStepChange = (stepId) => {
+    setCurrentGuiaStepId(stepId);
+
+    switch (stepId) {
+      case "menu-gestor":
+        setModalConfigOpen(false);
+        setModalMetasOpen(false);
+        setCalcState("closed");
+        setMenuAberto(true);
+        break;
+      case "config-geral":
+        setMenuAberto(false);
+        setModalConfigOpen(true);
+        break;
+      case "config-categorias":
+      case "config-dados":
+        setMenuAberto(true);
+        setModalConfigOpen(true);
+        break;
+      case "novo-gasto":
+        setModalConfigOpen(false);
+        setModalMetasOpen(false);
+        setMenuAberto(false);
+        setActiveTab("cadastro");
+        break;
+      case "resumo-mes":
+        setModalMetasOpen(false);
+        setActiveTab("resumo");
+        break;
+      case "meta-semanal":
+        setActiveTab("resumo");
+        setModalMetasOpen(true);
+        break;
+      case "historico-contas":
+        setModalMetasOpen(false);
+        setMenuAberto(false);
+        setCalcState("closed");
+        setActiveTab("registros");
+        break;
+      case "calculadora":
+        setActiveTab("registros");
+        setCalcPos(null);
+        setCalcState("open");
+        break;
+      case "voltar-mapa":
+        setCalcState("closed");
+        setMenuAberto(true);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleCloseGuia = () => {
+    setGuiaAberto(false);
+    setCurrentGuiaStepId(null);
+    setMenuAberto(false);
+    setModalConfigOpen(false);
+    setModalMetasOpen(false);
+    setCalcState("closed");
+  };
+
+  const guiaConfigTab =
+    guiaAberto && currentGuiaStepId === "config-geral"
+      ? "alertas"
+      : guiaAberto && currentGuiaStepId === "config-categorias"
+        ? "exibicao"
+        : guiaAberto && currentGuiaStepId === "config-dados"
+          ? "dados"
+          : null;
 
   const filteredAccounts = accounts.filter(
     (acc) => acc.date && acc.date.substring(0, 7) === currentMonth,
@@ -610,6 +701,7 @@ export default function GestorGastos() {
         isDark={isDark}
         onOpenConfig={() => setModalConfigOpen(true)}
         setActiveTab={setActiveTab}
+        onOpenGuia={() => setGuiaAberto(true)}
       />
 
       <ModalConfig
@@ -623,6 +715,7 @@ export default function GestorGastos() {
         onImportJSON={importJSON}
         onExportCSV={exportCSV}
         onClearAllAccounts={clearAllAccounts}
+        forcedTab={guiaConfigTab}
       />
 
       <ModalMetas
@@ -659,9 +752,22 @@ export default function GestorGastos() {
         calcState={calcState}
         setCalcState={setCalcState}
         calcPos={calcPos}
+        onResetPos={() => setCalcPos(null)}
         onDragStart={handleDragStart}
         calcDisplay={calcDisplay}
         setCalcDisplay={setCalcDisplay}
+      />
+
+      <GuiaUsoGestor
+        isOpen={guiaAberto}
+        onClose={handleCloseGuia}
+        theme={config.theme}
+        activeTab={activeTab}
+        menuAberto={menuAberto}
+        modalConfigOpen={modalConfigOpen}
+        modalMetasOpen={modalMetasOpen}
+        calcState={calcState}
+        onStepChange={handleGuiaStepChange}
       />
     </div>
   );

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { baseDeDados } from "../../data/baseDeDados";
 
 const VERSAO_ATUAL = __APP_VERSION__;
+const FINANCE_STORAGE_KEY = "gestao_financeira_v1";
+const CAT_STORAGE_KEY = "gestao_categorias_v1";
 const CFG_STORAGE_KEY = "gestao_config_v1";
 const THEME_SYNC_EVENT = "sade-theme-sync";
 
@@ -37,8 +38,8 @@ export default function MenuLateral({
   onAlternarModoNoturno,
   onAtivarModoSugestao,
   onLimparRota,
+  onAbrirGuiaUso,
 }) {
-  const [modalGuiaAberto, setModalGuiaAberto] = useState(false);
   const [darkAtivo, setDarkAtivo] = useState(() =>
     lerModoNoturnoCompartilhado(modoNoturno),
   );
@@ -79,13 +80,44 @@ export default function MenuLateral({
     }
   };
 
-  const verificarAtualizacoes = () => {
-    const savedCfg = localStorage.getItem(CFG_STORAGE_KEY);
-    localStorage.clear();
-    if (savedCfg) {
-      localStorage.setItem(CFG_STORAGE_KEY, savedCfg);
-    }
-    window.location.reload(true);
+  const verificarAtualizacoes = async () => {
+    const preservedEntries = {};
+    [FINANCE_STORAGE_KEY, CAT_STORAGE_KEY, CFG_STORAGE_KEY].forEach((key) => {
+      try {
+        const val = localStorage.getItem(key);
+        if (val !== null) {
+          preservedEntries[key] = val;
+        }
+      } catch {}
+    });
+
+    try {
+      localStorage.clear();
+    } catch {}
+
+    Object.entries(preservedEntries).forEach(([key, val]) => {
+      try {
+        localStorage.setItem(key, val);
+      } catch {}
+    });
+
+    try {
+      if ("caches" in window && typeof caches.keys === "function") {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((name) => caches.delete(name)));
+      }
+    } catch {}
+
+    try {
+      if ("serviceWorker" in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(
+          registrations.map((registration) => registration.update()),
+        );
+      }
+    } catch {}
+
+    window.location.reload();
   };
 
   return (
@@ -350,7 +382,7 @@ export default function MenuLateral({
                   texto="Guia de Uso"
                   onClick={() => {
                     onFechar();
-                    setModalGuiaAberto(true);
+                    if (onAbrirGuiaUso) onAbrirGuiaUso();
                   }}
                 />
 
@@ -386,49 +418,6 @@ export default function MenuLateral({
                 Versão {VERSAO_ATUAL} • © 2026 SADE
               </p>
             </div>
-          </div>
-        </div>
-      )}
-
-      {modalGuiaAberto && (
-        <div
-          className="modal-overlay"
-          onClick={() => setModalGuiaAberto(false)}
-        >
-          <div
-            className={`modal-content ${darkAtivo ? "dark" : "light"}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header-box">
-              <h3 className="modal-title-text">📖 Guia de Uso do SADE</h3>
-              <button
-                onClick={() => setModalGuiaAberto(false)}
-                className="modal-close-btn"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="modal-body-text">
-              <p className="modal-p">
-                <strong>1. Pesquisa:</strong> Busque por Quadra, Bairro ou CEP
-                na barra superior.
-              </p>
-              <p className="modal-p">
-                <strong>2. Detalhes:</strong> Toque em qualquer quadra no mapa
-                para visualizar informações e rotas.
-              </p>
-              <p className="modal-p">
-                <strong>3. Modo Noturno:</strong> Ative no menu para usar o mapa
-                com fundo escuro (Amoled).
-              </p>
-            </div>
-            <button
-              onClick={() => setModalGuiaAberto(false)}
-              className="modal-action-btn"
-            >
-              Entendido
-            </button>
           </div>
         </div>
       )}
