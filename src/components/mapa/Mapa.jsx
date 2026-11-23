@@ -429,6 +429,7 @@ export default function Mapa({ onMudancaSelecao }) {
         onReportarErro={reportarErro}
         onLimparRota={limparRota}
         onAbrirGuiaUso={() => setGuiaAberto(true)}
+        totalQuadras={baseDeDados.length}
       />
 
       <PainelRota

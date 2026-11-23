@@ -1,0 +1,42 @@
+export default [
+  {
+    bairro: "Beira Rio 2",
+    quadra: "A",
+    cep: "72900-628",
+    lat: -15.93643,
+    lng: -48.255636,
+    obs: "",
+  },
+  {
+    bairro: "Beira Rio 2",
+    quadra: "B",
+    cep: "72900-622",
+    lat: -15.935853,
+    lng: -48.255798,
+    obs: "",
+  },
+  {
+    bairro: "Beira Rio 2",
+    quadra: "C",
+    cep: "72900-626",
+    lat: -15.935781,
+    lng: -48.25515,
+    obs: "",
+  },
+  {
+    bairro: "Beira Rio 2",
+    quadra: "D",
+    cep: "72900-620",
+    lat: -15.93494,
+    lng: -48.256163,
+    obs: "",
+  },
+  {
+    bairro: "Beira Rio 2",
+    quadra: "E",
+    cep: "72900-624",
+    lat: -15.934753,
+    lng: -48.255519,
+    obs: "",
+  },
+];

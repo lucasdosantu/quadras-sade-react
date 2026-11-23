@@ -39,6 +39,7 @@ export default function MenuLateral({
   onAtivarModoSugestao,
   onLimparRota,
   onAbrirGuiaUso,
+  totalQuadras = 0,
 }) {
   const [darkAtivo, setDarkAtivo] = useState(() =>
     lerModoNoturnoCompartilhado(modoNoturno),
@@ -416,6 +417,8 @@ export default function MenuLateral({
               />
               <p className="menu-version-text">
                 Versão {VERSAO_ATUAL} • © 2026 SADE
+                <br />
+                {totalQuadras} quadras mapeadas
               </p>
             </div>
           </div>

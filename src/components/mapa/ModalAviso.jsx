@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { baseDeDados } from "../../data/baseDeDados";
 
 const VERSAO_SISTEMA = __APP_VERSION__;
 const CFG_STORAGE_KEY = "gestao_config_v1";
@@ -79,12 +80,8 @@ export default function ModalAviso() {
             <b>Ex:</b> <i>6, Vila Paraíso</i>
           </p>
           <p className="modal-p">
-            Atualmente os bairros{" "}
-            <b>
-              Vila Esperança, Vila Paraíso 1, 2 & 3, Gomes Rabelo,{" "}
-              <i>Vila São Luiz 1 & 2 e Montes Claros 2</i>
-            </b>{" "}
-            estão completamente mapeados.
+            Atualmente vários bairros estão completamente mapeados com um total
+            de {baseDeDados.length} pontos mapeados.
           </p>
           <p className="modal-p">
             Outras quadras estão sendo adicionadas aos poucos conforme tenho
