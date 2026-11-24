@@ -80,8 +80,8 @@ export default function ModalAviso() {
             <b>Ex:</b> <i>6, Vila Paraíso</i>
           </p>
           <p className="modal-p">
-            Atualmente vários bairros estão completamente mapeados com um total
-            de {baseDeDados.length} pontos mapeados.
+            Atualmente quase todos os bairros estão completamente mapeados com
+            um total de {baseDeDados.length} pontos mapeados.
           </p>
           <p className="modal-p">
             Outras quadras estão sendo adicionadas aos poucos conforme tenho

@@ -1,0 +1,42 @@
+export default [
+  {
+    bairro: "Maria Auxiliadora",
+    quadra: "1",
+    cep: "72900-128",
+    lat: -15.947952,
+    lng: -48.27215,
+    obs: "",
+  },
+  {
+    bairro: "Maria Auxiliadora",
+    quadra: "2",
+    cep: "72900-124",
+    lat: -15.947844,
+    lng: -48.271692,
+    obs: "",
+  },
+  {
+    bairro: "Maria Auxiliadora",
+    quadra: "3",
+    cep: "72900-122",
+    lat: -15.9481,
+    lng: -48.271474,
+    obs: "",
+  },
+  {
+    bairro: "Maria Auxiliadora",
+    quadra: "4",
+    cep: "72900-126",
+    lat: -15.949308,
+    lng: -48.272843,
+    obs: "",
+  },
+  {
+    bairro: "Maria Auxiliadora",
+    quadra: "Área Especial 58",
+    cep: "72900-120",
+    lat: -15.947665,
+    lng: -48.27075,
+    obs: "",
+  },
+];
