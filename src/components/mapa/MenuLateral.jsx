@@ -37,8 +37,10 @@ export default function MenuLateral({
   modoNoturno,
   onAlternarModoNoturno,
   onAtivarModoSugestao,
+  onReportarErro,
   onLimparRota,
   onAbrirGuiaUso,
+  onAbrirTermosUso,
   totalQuadras = 0,
 }) {
   const [darkAtivo, setDarkAtivo] = useState(() =>
@@ -121,6 +123,19 @@ export default function MenuLateral({
     window.location.reload();
   };
 
+  const handleReportarErro = () => {
+    if (typeof onReportarErro === "function") {
+      onReportarErro();
+    } else {
+      window.open(
+        "https://docs.google.com/forms/d/e/1FAIpQLSeY6iMNQ4fUqIBU2QOgqm5InyaXd1x2z0-J9Fn3gLqSJ01HLw/viewform",
+        "_blank",
+        "noopener,noreferrer",
+      );
+    }
+    onFechar();
+  };
+
   return (
     <>
       {aberto && (
@@ -138,7 +153,7 @@ export default function MenuLateral({
                       viewBox="0 0 512 512"
                       width="100%"
                       height="100%"
-                      aria-label="Logo SADE"
+                      aria-label="Logo LocaliSADE"
                     >
                       <defs>
                         <linearGradient
@@ -148,12 +163,32 @@ export default function MenuLateral({
                           x2="0%"
                           y2="100%"
                         >
-                          <stop offset="0%" stopColor="#ff5252" />
-                          <stop offset="100%" stopColor="#d32f2f" />
+                          <stop offset="0%" stopColor="#ef4444" />
+                          <stop offset="100%" stopColor="#b91c1c" />
                         </linearGradient>
-
+                        <linearGradient
+                          id="anelAzul"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#38bdf8" />
+                          <stop offset="50%" stopColor="#0284c7" />
+                          <stop offset="100%" stopColor="#1e3a8a" />
+                        </linearGradient>
+                        <linearGradient
+                          id="mapaEsmeralda"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#34d399" />
+                          <stop offset="100%" stopColor="#059669" />
+                        </linearGradient>
                         <filter
-                          id="shadow"
+                          id="sombraLogo"
                           x="-20%"
                           y="-20%"
                           width="140%"
@@ -161,58 +196,72 @@ export default function MenuLateral({
                         >
                           <feDropShadow
                             dx="0"
-                            dy="6"
-                            stdDeviation="8"
+                            dy="8"
+                            stdDeviation="10"
                             floodColor="#000000"
-                            floodOpacity="0.35"
+                            floodOpacity="0.28"
                           />
                         </filter>
                       </defs>
-
-                      <g filter="url(#shadow)">
+                      <g filter="url(#sombraLogo)">
                         <polygon
-                          points="80,220 256,170 256,460 80,390"
-                          fill="#4caf50"
+                          points="84,265 256,215 256,445 84,395"
+                          fill="url(#anelAzul)"
                         />
                         <polygon
-                          points="256,170 432,220 432,390 256,460"
-                          fill="#29b6f6"
+                          points="256,215 428,265 428,395 256,445"
+                          fill="url(#mapaEsmeralda)"
                         />
-                        <polygon
-                          points="130,235 256,195 256,415 130,360"
-                          fill="#ffca28"
+                        <line
+                          x1="84"
+                          y1="330"
+                          x2="256"
+                          y2="285"
+                          stroke="#ffffff"
+                          strokeWidth="8"
+                          strokeOpacity="0.7"
                         />
-                        <polygon
-                          points="256,195 382,235 382,360 256,415"
-                          fill="#ffa726"
+                        <line
+                          x1="256"
+                          y1="285"
+                          x2="428"
+                          y2="330"
+                          stroke="#facc15"
+                          strokeWidth="8"
+                          strokeOpacity="0.9"
                         />
-                        <polygon
-                          points="80,220 170,255 170,380 80,390"
-                          fill="#26a69a"
+                        <line
+                          x1="170"
+                          y1="240"
+                          x2="170"
+                          y2="420"
+                          stroke="#ffffff"
+                          strokeWidth="7"
+                          strokeOpacity="0.55"
                         />
-                        <polygon
-                          points="342,255 432,220 432,390 342,355"
-                          fill="#ab47bc"
+                        <line
+                          x1="342"
+                          y1="240"
+                          x2="342"
+                          y2="420"
+                          stroke="#ffffff"
+                          strokeWidth="7"
+                          strokeOpacity="0.55"
                         />
                       </g>
-
-                      <g filter="url(#shadow)">
+                      <g filter="url(#sombraLogo)">
                         <path
-                          d="M256,40 C172,40 104,108 104,192 C104,288 256,432 256,432 C256,432 408,288 408,192 C408,108 340,40 256,40 Z"
+                          d="M256,44 C182,44 122,104 122,178 C122,265 256,388 256,388 C256,388 390,265 390,178 C390,104 330,44 256,44 Z"
                           fill="url(#pinGrad)"
                         />
-                        <circle
-                          cx="256"
-                          cy="192"
-                          r="56"
-                          fill="#ffffff"
-                          opacity="0.95"
-                        />
+                        <circle cx="256" cy="176" r="50" fill="#ffffff" />
                       </g>
                     </svg>
                   </div>
                   <div className="menu-title-wrapper">
-                    <h2 className="menu-title">SADE</h2>
+                    <h2 className="menu-title">
+                      Locali<strong style={{ fontWeight: 900 }}>SADE</strong>
+                    </h2>
                     <span className="menu-subtitle">
                       Localizador de Quadras
                     </span>
@@ -288,105 +337,132 @@ export default function MenuLateral({
                 </div>
               </div>
 
+              <div className="menu-section-divider">
+                <div className="menu-items-list" style={{ marginTop: 0 }}>
+                  <ItemMenu
+                    icone={
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#ef4444"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                      </svg>
+                    }
+                    texto="Limpar Rota Atual"
+                    onClick={() => {
+                      if (onLimparRota) onLimparRota();
+                      onFechar();
+                    }}
+                  />
+
+                  <ItemMenu
+                    icone={
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#3b82f6"
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                    }
+                    texto="Sugerir Nova Quadra"
+                    onClick={() => {
+                      onFechar();
+                      if (onAtivarModoSugestao) onAtivarModoSugestao();
+                    }}
+                  />
+
+                  <ItemMenu
+                    icone={
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#eab308"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                      </svg>
+                    }
+                    texto="Reportar Erro no Mapa"
+                    onClick={handleReportarErro}
+                  />
+
+                  <ItemMenu
+                    icone={
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#8b5cf6"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                      </svg>
+                    }
+                    texto="Guia de Uso"
+                    onClick={() => {
+                      onFechar();
+                      if (onAbrirGuiaUso) onAbrirGuiaUso();
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="menu-section-divider">
+                <div className="menu-items-list" style={{ marginTop: 0 }}>
+                  <ItemMenu
+                    icone={
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#64748b"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                      </svg>
+                    }
+                    texto="Termos de Uso"
+                    onClick={() => {
+                      onFechar();
+                      if (onAbrirTermosUso) onAbrirTermosUso();
+                    }}
+                  />
+                </div>
+              </div>
+
               <div className="menu-items-list">
-                <ItemMenu
-                  icone={
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <polyline points="3 6 5 6 21 6"></polyline>
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      <line x1="10" y1="11" x2="10" y2="17"></line>
-                      <line x1="14" y1="11" x2="14" y2="17"></line>
-                    </svg>
-                  }
-                  texto="Limpar Rota Atual"
-                  onClick={() => {
-                    if (onLimparRota) onLimparRota();
-                    onFechar();
-                  }}
-                />
-
-                <ItemMenu
-                  icone={
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#3b82f6"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                  }
-                  texto="Sugerir Nova Quadra"
-                  onClick={() => {
-                    onFechar();
-                    if (onAtivarModoSugestao) onAtivarModoSugestao();
-                  }}
-                />
-
-                <ItemMenu
-                  icone={
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#eab308"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                      <line x1="12" y1="9" x2="12" y2="13"></line>
-                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                  }
-                  texto="Reportar Erro no Mapa"
-                  onClick={() => {
-                    window.open(
-                      "https://forms.gle/e2cBxK6Q86CTtRcj9",
-                      "_blank",
-                    );
-                    onFechar();
-                  }}
-                />
-
-                <ItemMenu
-                  icone={
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#8b5cf6"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                    </svg>
-                  }
-                  texto="Guia de Uso"
-                  onClick={() => {
-                    onFechar();
-                    if (onAbrirGuiaUso) onAbrirGuiaUso();
-                  }}
-                />
-
                 <ItemMenu
                   icone={
                     <svg
@@ -416,7 +492,7 @@ export default function MenuLateral({
                 className="menu-counter-img"
               />
               <p className="menu-version-text">
-                Versão {VERSAO_ATUAL} • © 2026 SADE
+                Versão {VERSAO_ATUAL} • © 2026 Locali<strong>SADE</strong>
                 <br />
                 {totalQuadras} quadras mapeadas
               </p>

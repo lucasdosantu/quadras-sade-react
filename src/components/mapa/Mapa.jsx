@@ -12,6 +12,7 @@ import ControlesMapa from "./ControlesMapa";
 import CardQuadra from "./CardQuadra";
 import CardSugestao from "./CardSugestao";
 import GuiaUsoMapa from "./GuiaUsoMapa";
+import ModalTermosUso from "./ModalTermosUso";
 import { criarIconeQuadraSvg, encontrarQuadraProxima } from "./pinosMapa";
 
 const CFG_STORAGE_KEY = "gestao_config_v1";
@@ -60,6 +61,7 @@ export default function Mapa({ onMudancaSelecao }) {
   const [tipoCamada, setTipoCamada] = useState("rua");
   const [menuAberto, setMenuAberto] = useState(false);
   const [guiaAberto, setGuiaAberto] = useState(false);
+  const [termosAberto, setTermosAberto] = useState(false);
   const [modoNoturno, setModoNoturno] = useState(() => lerModoNoturnoSalvo());
   const [modoSugestao, setModoSugestao] = useState(false);
 
@@ -121,7 +123,8 @@ export default function Mapa({ onMudancaSelecao }) {
       localSelecionado ||
       (modoSugestao && pontoSugestao) ||
       menuAberto ||
-      guiaAberto,
+      guiaAberto ||
+      termosAberto,
     );
     onMudancaSelecao(temOverlayAtivo);
   }, [
@@ -130,6 +133,7 @@ export default function Mapa({ onMudancaSelecao }) {
     pontoSugestao,
     menuAberto,
     guiaAberto,
+    termosAberto,
     onMudancaSelecao,
   ]);
 
@@ -429,6 +433,7 @@ export default function Mapa({ onMudancaSelecao }) {
         onReportarErro={reportarErro}
         onLimparRota={limparRota}
         onAbrirGuiaUso={() => setGuiaAberto(true)}
+        onAbrirTermosUso={() => setTermosAberto(true)}
         totalQuadras={baseDeDados.length}
       />
 
@@ -501,6 +506,13 @@ export default function Mapa({ onMudancaSelecao }) {
         localSelecionado={localSelecionado}
         pontosDaRotaCount={pontosDaRota.length}
         menuAberto={menuAberto}
+      />
+
+      <ModalTermosUso
+        isOpen={termosAberto}
+        onClose={() => setTermosAberto(false)}
+        isDark={modoNoturno}
+        onReportarErro={reportarErro}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { baseDeDados } from "../../data/baseDeDados";
 const VERSAO_SISTEMA = __APP_VERSION__;
 const CFG_STORAGE_KEY = "gestao_config_v1";
 const THEME_SYNC_EVENT = "sade-theme-sync";
+const IMG_BASE_PATH = "/quadras-sade-react/img";
 
 function lerModoNoturnoSalvo() {
   try {
@@ -13,6 +14,29 @@ function lerModoNoturnoSalvo() {
     }
   } catch {}
   return false;
+}
+
+function PassoInstalacaoImg({ src, alt }) {
+  const [ocultar, setOcultar] = useState(false);
+
+  if (ocultar) return null;
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setOcultar(true)}
+      style={{
+        width: "100%",
+        maxHeight: "170px",
+        objectFit: "contain",
+        borderRadius: "10px",
+        marginTop: "6px",
+        border: "1px solid rgba(148, 163, 184, 0.25)",
+        backgroundColor: "rgba(15, 23, 42, 0.04)",
+      }}
+    />
+  );
 }
 
 export default function ModalAviso() {
@@ -63,36 +87,48 @@ export default function ModalAviso() {
       <div className={`modal-content ${modoNoturno ? "dark" : "light"}`}>
         <div className="modal-header-box">
           <span className="modal-aviso-icone">📢</span>
-          <h3 className="modal-title-text">Aviso Importante</h3>
+          <h3 className="modal-title-text">Aviso — LocaliSADE</h3>
         </div>
 
         <div className="modal-body-text">
-          <p className="modal-p">Seja bem-vindo ao Localizador de Quadras!</p>
           <p className="modal-p">
-            <strong>MODO ESCURO HABILITADO!</strong> Experimente no menu
-            lateral.
+            Bem-vindo ao <strong>LocaliSADE</strong>! Atualmente são{" "}
+            <strong>{baseDeDados.length}</strong> quadras mapeadas. Busque por
+            número, quadra ou CEP (apenas números) e use o menu lateral para
+            sugerir quadras, reportar erros ou abrir o Gestor de Gastos.
           </p>
+
+          <p className="modal-p" style={{ marginTop: "6px" }}>
+            <strong>Como instalar no aparelho:</strong>
+          </p>
+
           <p className="modal-p">
-            Você pode pesquisar quadras apenas digitando o número ou buscar
-            diretamente pelo CEP (apenas números).
+            <strong>1.</strong> Abra o menu do navegador (ícone de opções / três
+            linhas ou três pontos).
           </p>
+          <PassoInstalacaoImg
+            src={`${IMG_BASE_PATH}/instalar-passo-1-menu.png`}
+            alt="Passo 1: abrir o menu do navegador"
+          />
+
           <p className="modal-p">
-            <b>Ex:</b> <i>6, Vila Paraíso</i>
+            <strong>2.</strong> Toque em <strong>Instalar aplicativo</strong> ou{" "}
+            <strong>Adicionar à tela inicial</strong> (ou{" "}
+            <strong>Adicionar à página inicial</strong>).
           </p>
+          <PassoInstalacaoImg
+            src={`${IMG_BASE_PATH}/instalar-passo-2-instalar.png`}
+            alt="Passo 2: tocar em Instalar aplicativo ou Adicionar à tela inicial"
+          />
+
           <p className="modal-p">
-            Atualmente quase todos os bairros estão completamente mapeados com
-            um total de {baseDeDados.length} pontos mapeados.
+            <strong>3.</strong> Confirme para criar o atalho do{" "}
+            <strong>LocaliSADE</strong> na tela inicial do aparelho.
           </p>
-          <p className="modal-p">
-            Outras quadras estão sendo adicionadas aos poucos conforme tenho
-            tempo de mapear. Por gentileza, caso veja alguma informação
-            erroneamente colocada no mapa, não hesite em me informar pelo menu
-            lateral.
-          </p>
-          <p className="modal-p">
-            Se você conhece alguma quadra que ainda não está cadastrada, clique
-            no <b>+</b> e clique sobre a quadra para me enviar a sugestão.
-          </p>
+          <PassoInstalacaoImg
+            src={`${IMG_BASE_PATH}/instalar-passo-3-confirmar.png`}
+            alt="Passo 3: confirmar instalação do LocaliSADE"
+          />
         </div>
 
         <button onClick={fechar} className="modal-action-btn">

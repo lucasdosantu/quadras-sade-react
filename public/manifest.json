@@ -1,6 +1,6 @@
 {
-  "name": "Localizador de Quadras SADE",
-  "short_name": "Quadras SADE",
+  "name": "LocaliSADE",
+  "short_name": "LocaliSADE",
   "start_url": "/quadras-sade-react/",
   "display": "standalone",
   "background_color": "#2c3e50",
